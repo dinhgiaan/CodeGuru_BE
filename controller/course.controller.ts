@@ -4,6 +4,7 @@ import ErrorHandler from "../utils/ErrorHandle";
 import cloudinary from "cloudinary";
 import { createCourse } from "../services/course.service";
 import CourseModel from "../models/course.model";
+import axios from "axios";
 //import axios from "";
 
 
@@ -74,12 +75,12 @@ export const editCourse = CatchAsyncError(async (req: Request, res: Response, ne
 });
 
 //tạo url cho video
-export const generateVideoUrl = CatchAsyncError(async(req: Request, res: Response, next: NextFunction) => {
+export const generateVideoUrl = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const {videoId} = req.body;
+        const { videoId } = req.body;
         const response = await axios.post(
             `https://dev.vdocipher.com/api/videos/${videoId}/otp`,
-            {ttl: 300},
+            { ttl: 300 },
             {
                 headers: {
                     Accept: 'application/json',

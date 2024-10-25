@@ -72,7 +72,7 @@ export const createActivationToken = (user: any): IActivationToken => {
         user, activationCode
     }, process.env.ACTIVATION_SECRET as Secret,
         {
-            expiresIn: "10m",  //giới hạn expired token
+            expiresIn: "20m",  //giới hạn expired token
         });
     return { token, activationCode };
 }
@@ -369,11 +369,11 @@ export const updateProfilePicture = CatchAsyncError(async (req: Request, res: Re
 });
 // get all users --- chi cho admin
 export const getAllUsers = CatchAsyncError(
-    async(req:Request,res:Response,next:NextFunction) =>{
-        try{
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
             getAllUsersService(res);
-        }catch(error:any){
-            return next(new ErrorHandler(error.message,400));
+        } catch (error: any) {
+            return next(new ErrorHandler(error.message, 400));
         }
     }
 )
