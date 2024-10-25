@@ -5,7 +5,6 @@ import cloudinary from "cloudinary";
 import { createCourse } from "../services/course.service";
 import CourseModel from "../models/course.model";
 import axios from "axios";
-//import axios from "";
 
 
 //upload course

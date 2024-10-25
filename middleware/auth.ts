@@ -3,6 +3,7 @@ import CatchAsyncError from "./catchAsycnError";
 import ErrorHandler from "../utils/ErrorHandle";
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import connectRedis from "../utils/redis";
+import { updateAccessToken } from "../controller/user.controller";
 
 export const isAuthenticated = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const access_token = req.cookies.access_token
@@ -11,11 +12,19 @@ export const isAuthenticated = CatchAsyncError(async (req: Request, res: Respons
         return next(new ErrorHandler("Vui lòng đăng nhập để truy cập nguồn tài nguyên này!", 400));
     }
 
-    const decoded = jwt.verify(access_token, process.env.ACCESS_TOKEN as string) as JwtPayload;
+    const decoded = jwt.decode(access_token) as JwtPayload;
 
     if (!decoded) {
         return next(new ErrorHandler("access token không hợp lệ", 400));
     }
+
+    if (decoded.exp && decoded.exp <= Date.now() / 1000) {
+        try {
+            await updateAccessToken(req, res, next);
+        } catch (error) {
+            return next(error);
+        }
+    } else {
 
     const user = await connectRedis().get(decoded.id);
 
@@ -26,6 +35,7 @@ export const isAuthenticated = CatchAsyncError(async (req: Request, res: Respons
     req.user = JSON.parse(user);
 
     next();
+}
 });
 
 //validate user role

@@ -9,7 +9,7 @@ import path from 'path'
 import sendMail from '../utils/sendMail'
 import { accessTokenOptions, refreshTokenOptions, sendToken } from '../utils/jwt'
 import connectRedis from '../utils/redis'
-import { getAllUsersService, getUserById } from '../services/user.service'
+import { getAllUsersService, getUserById, updateUserRoleService } from '../services/user.service'
 import cloudinary from 'cloudinary';
 
 
@@ -203,7 +203,7 @@ export const updateAccessToken = CatchAsyncError(async (req: Request, res: Respo
             status: "success",
             accessToken,
         })
-        next();
+        return next();
     } catch (error: any) {
         return next(new ErrorHandler(error.message, 400));
     }
@@ -373,6 +373,54 @@ export const getAllUsers = CatchAsyncError(
         try {
             getAllUsersService(res);
         } catch (error: any) {
+            return next(new ErrorHandler(error.message, 400));
+        }
+    }
+)
+
+// cập nhật vai trò --- cho admin
+
+export const updateUserRole = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { email, role } = req.body;
+        const isUserExist = await userModel.findOne({ email });
+        if (isUserExist) {
+            const id = isUserExist._id
+            updateUserRoleService(res, id, role);
+        }
+        else {
+            res.status(400).json({
+                success: false,
+                message: "Không tìm thấy người dùng"
+            })
+        }
+    } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400));
+    }
+})
+
+// xóa người dùng --- cho admin
+export const deleteUser = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { id } = req.params;
+
+            const user = await userModel.findById(id);
+
+            if (!user) {
+                return next(new ErrorHandler("Không tìm thấy người dùng", 404));
+            }
+
+            await user.deleteOne({ id });
+
+            await connectRedis().del(id);
+
+            res.status(200).json({
+                success: true,
+                message: "Người dùng đã được xóa thành công",
+            })
+        }
+        catch (error: any) {
             return next(new ErrorHandler(error.message, 400));
         }
     }
