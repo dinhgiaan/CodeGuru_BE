@@ -5,11 +5,11 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import connectDB from './utils/db';
 import connectRedis from './utils/redis';
-import ErrorMiddleware from './middleware/error';
 const app = express();
 import userRouter from './routes/user.route'
 import { v2 as cloudinary } from 'cloudinary';
 import courseRouter from './routes/course.route';
+import { error } from 'console';
 
 
 dotenv.config({ path: path.resolve(__dirname, '.env.development') });
@@ -66,13 +66,15 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
 
 //middleware xử lý lỗi
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+     if (res.headersSent) {
+          return next(err);  // Ngăn không gửi phản hồi thêm lần nữa
+     }
      const statusCode = err.statusCode || 500;
      res.status(statusCode).json({
           success: false,
-          message: err.message || 'Lỗi server'
+          message: err.message || 'Lỗi server',
+          error: err
      });
 });
-
-app.use(ErrorMiddleware);
 
 export default app;

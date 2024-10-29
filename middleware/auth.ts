@@ -26,16 +26,16 @@ export const isAuthenticated = CatchAsyncError(async (req: Request, res: Respons
         }
     } else {
 
-    const user = await connectRedis().get(decoded.id);
+        const user = await connectRedis().get(decoded.id);
 
-    if (!user) {
-        return next(new ErrorHandler("Người dùng không được tìm thấy!", 400));
+        if (!user) {
+            return next(new ErrorHandler("Người dùng không được tìm thấy!", 400));
+        }
+
+        req.user = JSON.parse(user);
+
+        next();
     }
-
-    req.user = JSON.parse(user);
-
-    next();
-}
 });
 
 //validate user role

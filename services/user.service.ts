@@ -2,35 +2,37 @@ import { Response } from "express";
 import connectRedis from "../utils/redis"
 import userModel from "../models/user.model";
 
-
-
-//get user by id
 export const getUserById = async (id: string, res: Response) => {
     const userJson = await connectRedis().get(id);
 
     if (userJson) {
-        const user = JSON.parse(userJson)
-        res.status(201).json({
+        const user = JSON.parse(userJson);
+        return res.status(201).json({  // Thêm return ở đây
             success: true,
             user,
-        })
+        });
     }
+
+    // Thêm một phản hồi khác nếu userJson không tồn tại để tránh trường hợp không gửi được phản hồi
+    return res.status(404).json({
+        success: false,
+        message: "User not found",
+    });
 };
-// get All users
+
 export const getAllUsersService = async (res: Response) => {
     const users = await userModel.find().sort({ createdAt: -1 });
-    res.status(201).json({
+    return res.status(201).json({
         success: true,
         users
-    })
+    });
 }
 
-// cập nhật vai trò
 export const updateUserRoleService = async (res: Response, id: string, role: string) => {
     const user = await userModel.findByIdAndUpdate(id, { role }, { new: true });
 
-    res.status(201).json({
+    return res.status(201).json({
         success: true,
         user,
-    })
+    });
 }
