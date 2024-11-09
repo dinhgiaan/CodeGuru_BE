@@ -332,31 +332,39 @@ export const updateProfilePicture = CatchAsyncError(async (req: Request, res: Re
         const userId = req.user?._id;
         const user = await userModel.findById(userId);
 
-        if (avatar && user) {
-            const cloudTasks = [];
+        if (!user) {
+            return next(new ErrorHandler("Không tìm thấy người dùng", 404));
+        }
 
-            // Xóa ảnh cũ (nếu có)
-            if (user?.avatar?.public_id) {
-                cloudTasks.push(cloudinary.v2.uploader.destroy(user?.avatar?.public_id));
-            }
-            // Tải ảnh mới lên
+        const cloudTasks: Promise<any>[] = [];
+
+        // Check if the user has an existing avatar
+        if (user.avatar && user.avatar.public_id) {
+            cloudTasks.push(cloudinary.v2.uploader.destroy(user.avatar.public_id));
+        }
+
+        // Upload the new avatar if provided
+        if (avatar) {
             cloudTasks.push(
                 cloudinary.v2.uploader.upload(avatar, {
                     folder: "avatars",
                     width: 150,
                 })
             );
+        }
 
-            const [_, myCloud] = await Promise.all(cloudTasks);
+        const results = await Promise.all(cloudTasks);
 
-            // Cập nhật avatar mới
+        // If the new avatar was uploaded, update the user's avatar
+        if (results.length > 0 && results[results.length - 1]) {
+            const myCloud = results[results.length - 1];
             user.avatar = {
                 public_id: myCloud.public_id,
                 url: myCloud.secure_url,
             };
         }
 
-        await user?.save();
+        await user.save();
         await connectRedis().set(userId, JSON.stringify(user));
 
         res.status(200).json({
