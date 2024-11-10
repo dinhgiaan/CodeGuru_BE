@@ -16,7 +16,7 @@ export const getUserById = async (id: string, res: Response) => {
     // Thêm một phản hồi khác nếu userJson không tồn tại để tránh trường hợp không gửi được phản hồi
     return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: "Không tìm thấy người dùng",
     });
 };
 
