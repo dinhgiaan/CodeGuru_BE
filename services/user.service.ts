@@ -3,21 +3,29 @@ import connectRedis from "../utils/redis"
 import userModel from "../models/user.model";
 
 export const getUserById = async (id: string, res: Response) => {
-    const userJson = await connectRedis().get(id);
+    try {
+        const redisClient = await connectRedis(); // Ensure you await the connection
+        const userJson = await redisClient.get(id);
 
-    if (userJson) {
-        const user = JSON.parse(userJson);
-        return res.status(201).json({  // Thêm return ở đây
-            success: true,
-            user,
+        if (userJson) {
+            const user = JSON.parse(userJson);
+            return res.status(200).json({
+                success: true,
+                user,
+            });
+        }
+
+        return res.status(404).json({
+            success: false,
+            message: "Không tìm thấy người dùng",
+        });
+    } catch (error) {
+        console.error("Error fetching user:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Đã xảy ra lỗi khi lấy người dùng",
         });
     }
-
-    // Thêm một phản hồi khác nếu userJson không tồn tại để tránh trường hợp không gửi được phản hồi
-    return res.status(404).json({
-        success: false,
-        message: "Không tìm thấy người dùng",
-    });
 };
 
 export const getAllUsersService = async (res: Response) => {
