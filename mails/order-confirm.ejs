@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Xác nhận đơn hàng</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            /* Thêm viền cho container */
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f5ef1, #6366f1);
+            padding: 40px 20px;
+            text-align: center;
+            color: white;
+            border-bottom: 1px solid #4f5ef1;
+            /* Thêm viền dưới cho header */
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 32px;
+        }
+
+        .order-info {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            border: 1px solid #e2e8f0;
+            /* Thêm viền cho order-info */
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 16px;
+        }
+
+        .order-number {
+            font-weight: 600;
+            color: #4f5ef1;
+        }
+
+        .order-date {
+            color: #64748b;
+            margin-left: 264px;
+            text-decoration: underline;
+        }
+
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
+            /* Thêm viền cho bảng */
+        }
+
+        .products-table th {
+            background: #f1f5f9;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            font-size: 14px;
+            text-transform: uppercase;
+            border: 1px solid #e2e8f0;
+            /* Thêm viền cho ô header */
+        }
+
+        .products-table td {
+            padding: 16px 12px;
+            border: 1px solid #e2e8f0;
+            /* Thêm viền cho ô dữ liệu */
+        }
+
+        .total-row {
+            font-weight: 600;
+            font-size: 18px;
+            text-align: right;
+            padding: 16px 0;
+            border-top: 2px solid #e2e8f0;
+            /* Thêm viền trên cho tổng tiền */
+        }
+
+        .total-amount {
+            color: #4f5ef1;
+        }
+
+        .support-section {
+            text-align: center;
+            margin-top: 40px;
+            padding: 24px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            /* Thêm viền cho phần hỗ trợ */
+        }
+
+        .support-section a {
+            color: #4f5ef1;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .support-section a:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px;
+            color: #64748b;
+            font-size: 14px;
+            border-top: 1px solid #e2e8f0;
+            background-color: #f8fafc;
+            /* Thêm màu nền cho footer */
+        }
+
+        .highlight {
+            color: #4f5ef1;
+            font-weight: 500;
+        }
+    </style>
+    <script>
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN').format(amount);
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Cảm ơn bạn đã đặt hàng! 🎉</h1>
+            <p>Đơn hàng của bạn đã được xác nhận và đang được xử lý</p>
+        </div>
+
+        <div class="content">
+            <div class="order-info">
+                <div class="order-header">
+                    <span class="order-number">Đơn hàng #<%= order._id %></span>
+                    <span class="order-date">
+                        <%= order.date %>
+                    </span>
+                </div>
+
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>Tên khóa học</th>
+                            <th>Số lượng</th>
+                            <th>Giá tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <%= order.name %>
+                            </td>
+                            <td>1</td>
+                            <td>
+                                <%= new Intl.NumberFormat('vi-VN').format(order.price) %> VNĐ
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="total-row">
+                    Tổng cộng: <span class="total-amount">
+                        <%= new Intl.NumberFormat('vi-VN').format(order.price) %> VNĐ
+                    </span>
+                </div>
+            </div>
+
+            <div class="support-section">
+                <p>Bạn cần hỗ trợ? Chúng tôi luôn sẵn sàng giúp đỡ!</p>
+                <p>Liên hệ với chúng tôi qua email <a href="mailto:support@codeguru.com">support@codeguru.com</a></p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 CodeGuru.</p>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -203,7 +203,6 @@ export const updateAccessToken = CatchAsyncError(async (req: Request, res: Respo
             status: "success",
             accessToken,
         })
-        return next();
     } catch (error: any) {
         return next(new ErrorHandler(error.message, 400));
     }
@@ -379,7 +378,7 @@ export const updateProfilePicture = CatchAsyncError(async (req: Request, res: Re
 export const getAllUsers = CatchAsyncError(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            getAllUsersService(res);
+            await getAllUsersService(res);
         } catch (error: any) {
             return next(new ErrorHandler(error.message, 400));
         }
@@ -394,7 +393,7 @@ export const updateUserRole = CatchAsyncError(async (req: Request, res: Response
         const isUserExist = await userModel.findOne({ email });
         if (isUserExist) {
             const id = isUserExist._id
-            updateUserRoleService(res, id, role);
+            await updateUserRoleService(res, id, role);
         }
         else {
             res.status(400).json({
