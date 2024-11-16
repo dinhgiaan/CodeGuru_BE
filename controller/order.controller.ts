@@ -9,11 +9,45 @@ import ejs from "ejs";
 import sendMail from "../utils/sendMail";
 import NotificationModel from "../models/notification.model";
 import { newOrder } from "../services/order.service";
+import connectRedis from "../utils/redis";
+require('dotenv').config({ path: '.env.development' });
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+
+// Hàm chuyển đổi VND sang smallest currency unit (1 VND)
+const convertVNDToStripeAmount = (amount: number) => {
+    // Stripe requires amount in smallest currency unit
+    // For VND, the smallest unit is 1 VND
+    return Math.round(amount);
+};
+
+// Hàm kiểm tra số tiền tối thiểu (khoảng 12,000 VND ~ $0.50)
+const isValidAmount = (amount: number) => {
+    const minAmount = 12000; // Tương đương với ~$0.50
+    return amount >= minAmount;
+};
 
 // create order
 export const createOrder = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { courseId, payment_info } = req.body as IOrder;
+
+        if (payment_info) {
+            if ("id" in payment_info) {
+                const paymentIntentId = payment_info.id;
+                const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+                if (paymentIntent.status !== "succeeded") {
+                    return next(new ErrorHandler("Thanh toán này chưa được xác thực", 400));
+                };
+
+                // Kiểm tra tiền tệ
+                if (paymentIntent.currency !== 'vnd') {
+                    return next(new ErrorHandler("Đơn vị tiền tệ không hợp lệ", 400));
+                }
+            };
+        };
+
         const user = await userModel.findById(req.user?._id);
         const courseExistInUser = user?.courses.some((course: any) => course._id.toString() === courseId);
         if (courseExistInUser) {
@@ -56,15 +90,15 @@ export const createOrder = CatchAsyncError(async (req: Request, res: Response, n
 
         if (user) {
             // Kiểm tra nếu user đã tồn tại
-            user.courses.push(course?._id);  // Thêm _id của khóa học vào mảng courses của người dùng
-
-            await user.save();  // Lưu lại các thay đổi cho user
+            user.courses.push(course?._id);
+            await connectRedis().set(req.user?._id, JSON.stringify(user));
+            await user.save();
 
             // Tạo thông báo cho người dùng
             await NotificationModel.create({
                 user: user._id,
                 title: "Đơn hàng mới",
-                message: `Bạn có đơn đặt hàng mới từ ${user?.name}`
+                message: `Bạn có đơn hàng mới từ ${user?.name}`
             });
         } else {
             return next(new ErrorHandler("Người dùng không tồn tại!", 400));  // Nếu không tìm thấy user
@@ -76,6 +110,43 @@ export const createOrder = CatchAsyncError(async (req: Request, res: Response, n
 
         newOrder(data, res, next);
 
+    } catch (error: any) {
+        return next(new ErrorHandler(error.message, 500));
+    }
+})
+
+// gửi key thanh toán
+export const sendStripePublishableKey = CatchAsyncError(async (req: Request, res: Response) => {
+    res.status(200).json({
+        publishablekey: process.env.STRIPE_PUBLISHABLE_KEY
+    });
+});
+
+// thanh toán mới
+export const newPayment = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { amount } = req.body;
+        // Kiểm tra số tiền tối thiểu
+        if (!isValidAmount(amount)) {
+            return next(new ErrorHandler("Số tiền thanh toán phải từ 12,000₫ trở lên", 400));
+        }
+        // Chuyển đổi sang đơn vị tiền nhỏ nhất của VND
+        const stripeAmount = convertVNDToStripeAmount(amount);
+        const myPayment = await stripe.paymentIntents.create({
+            amount: stripeAmount,
+            currency: "vnd",
+            metadata: {
+                company: "CodeGuru"
+            },
+            automatic_payment_methods: {
+                enabled: true
+            },
+        });
+
+        res.status(201).json({
+            success: true,
+            client_secret: myPayment.client_secret
+        })
     } catch (error: any) {
         return next(new ErrorHandler(error.message, 500));
     }
