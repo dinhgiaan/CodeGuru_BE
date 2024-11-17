@@ -61,6 +61,12 @@ export const createOrder = CatchAsyncError(async (req: Request, res: Response, n
 
         const data: any = {
             courseId: course._id,
+            name: course.name,
+            price: course.price,
+            thumbnail: {
+                public_id: course.thumbnail.public_id,
+                url: course.thumbnail.url,
+            },
             userId: user?._id,
             payment_info
         };
@@ -89,8 +95,15 @@ export const createOrder = CatchAsyncError(async (req: Request, res: Response, n
         }
 
         if (user) {
-            // Kiểm tra nếu user đã tồn tại
-            user.courses.push(course?._id);
+            user.courses.push({
+                courseId: course._id,
+                name: course.name,
+                price: course.price,
+                thumbnail: {
+                    public_id: course.thumbnail.public_id,
+                    url: course.thumbnail.url,
+                },
+            });
             await connectRedis().set(req.user?._id, JSON.stringify(user));
             await user.save();
 
