@@ -11,6 +11,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import courseRouter from './routes/course.route';
 import { error } from 'console';
 import orderRouter from './routes/order.route';
+import layoutRouter  from './routes/layout.route';
 
 
 dotenv.config({ path: path.resolve(__dirname, '.env.development') });
@@ -47,7 +48,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 
 //routes
-app.use("/api/v1/", userRouter, courseRouter, orderRouter);
+app.use("/api/v1/", userRouter, courseRouter, orderRouter, layoutRouter);
 
 //test API
 app.get("/test", (req: Request, res: Response, next: NextFunction) => {
