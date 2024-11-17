@@ -1,4 +1,4 @@
-import mongoose, { Model, Schema, Document } from "mongoose";
+import mongoose, { Model, Schema, Document, ObjectId } from "mongoose";
 import bcrypt from 'bcryptjs';
 require('dotenv').config();
 import jwt from 'jsonwebtoken';
@@ -19,7 +19,15 @@ export interface IUser extends Document {
     },
     role: string;
     isVerified: boolean;
-    courses: Array<{ courseId: string }>;
+    courses: Array<{
+        courseId: ObjectId,
+        name: string,
+        price: number,
+        thumbnail: {
+            public_id: string,
+            url: string
+        }
+    }>;
     comparePassword: (password: string) => Promise<boolean>;
     SignAccessToken: () => string;
     SignRefreshToken: () => string;
@@ -60,7 +68,13 @@ const userSchema: Schema<IUser> = new mongoose.Schema({
     },
     courses: [
         {
-            courseId: String
+            courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
+            name: String,
+            price: Number,
+            thumbnail: {
+                public_id: String,
+                url: String,
+            }
         }
     ],
 }, { timestamps: true });
