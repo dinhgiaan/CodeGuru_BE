@@ -9,9 +9,8 @@ const app = express();
 import userRouter from './routes/user.route'
 import { v2 as cloudinary } from 'cloudinary';
 import courseRouter from './routes/course.route';
-import { error } from 'console';
 import orderRouter from './routes/order.route';
-import layoutRouter  from './routes/layout.route';
+import layoutRouter from './routes/layout.route';
 
 
 dotenv.config({ path: path.resolve(__dirname, '.env.development') });

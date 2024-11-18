@@ -137,3 +137,28 @@ export const getAllCourses = CatchAsyncError(async (req: Request, res: Response,
         return next(new ErrorHandler(error.message, 500));
     }
 })
+
+// get course content -- for valid user
+export const getCourseByUser = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userCourseList = req.user?.courses
+        const courseId = req.params.id;
+
+        const courseExist = userCourseList?.find((courses: any) => courses.courseId === courses.courseId);
+
+        if (!courseExist) {
+            return next(new ErrorHandler("Bạn không được phép xem khóa học này", 404));
+        }
+
+        const course = await CourseModel.findById(courseId);
+
+        const content = course?.courseData;
+
+        res.status(200).json({
+            success: true,
+            content
+        })
+    } catch (error: any) {
+        return next(new ErrorHandler(error.message, 500));
+    }
+})
