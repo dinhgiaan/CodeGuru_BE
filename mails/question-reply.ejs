@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông báo trả lời mới</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #e9ecef;
+            margin: 0;
+            padding: 20px 0;
+            line-height: 1.6;
+            color: #2c3e50;
+        }
+        .email-container {
+            max-width: 680px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+            border: 1px solid #dee2e6;
+            overflow: hidden;
+        }
+        .email-header {
+            background-color: #6399d0;
+            color: #ececec;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .email-content {
+            padding: 30px;
+            background-color: #ffffff;
+        }
+        .email-footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: #0070f3;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .cta-button:hover {
+            background-color: #0051bb;
+        }
+        @media screen and (max-width: 600px) {
+            .email-container {
+                width: 100%;
+                border-radius: 0;
+            }
+            .email-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <img src="https://res.cloudinary.com/duw4cwp7d/image/upload/v1728060682/logo-codeguru_mjy0p9.png" alt="CodeGuru Logo" style="max-width: 150px; margin-bottom: 10px;">
+            <h1 style="margin: 0; font-size: 24px;">Thông báo trả lời mới</h1>
+        </div>
+        <div class="email-content">
+            <% if (typeof name !== 'undefined' && name) { %>
+                <p style="margin-bottom: 20px;">Xin chào <%= name %>,</p>
+            <% } else { %>
+                <p style="margin-bottom: 20px;">Xin chào,</p>
+            <% } %>
+            
+            <% if (typeof title !== 'undefined' && title) { %>
+                <p>Một câu trả lời mới đã được thêm vào câu hỏi của bạn trong video "<strong><%= title %></strong>".</p>
+            <% } else { %>
+                <p>Một câu trả lời mới đã được thêm vào câu hỏi của bạn.</p>
+            <% } %>
+            
+            <p>Chúng tôi khuyến khích bạn đăng nhập để xem chi tiết và tiếp tục cuộc thảo luận.</p>
+        </div>
+        
+        <div class="email-footer">
+            <p>© 2024 CodeGuru.</p>
+            <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ <a href="mailto:support@codeguru.com" style="color: #0070f3;">support@codeguru.com</a></p>
+        </div>
+    </div>
+</body>
+</html>

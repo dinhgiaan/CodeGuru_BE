@@ -3,15 +3,15 @@ import { IUser } from "./user.model";
 
 interface IComment extends Document {
     user: IUser,
-    comment: string,
-    commentReply: IComment[],
+    question: string,
+    questionReplies: IComment[],
 }
 
 interface IReview extends Document {
     user: IUser,
     rating?: number,
     comment: string,
-    commentReply?: IComment[],
+    commentReplies?: IComment[],
 }
 
 interface ILink extends Document {
@@ -56,8 +56,8 @@ const reviewSchema = new Schema<IReview>({
         default: 0,
     },
     comment: String,
-    commentReply: [Object],
-});
+    commentReplies: [Object],
+},{timestamps:true});
 
 const linkSchema = new Schema<ILink>({
     title: String,
@@ -66,9 +66,9 @@ const linkSchema = new Schema<ILink>({
 
 const commentSchema = new Schema<IComment>({
     user: Object,
-    comment: String,
-    commentReply: [Object],
-});
+    question: String,
+    questionReplies: [Object],
+},{timestamps:true});
 
 const courseDataSchema = new Schema<ICourseData>({
     videoUrl: String,
