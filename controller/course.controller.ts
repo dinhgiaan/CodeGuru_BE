@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import CatchAsyncError from "../middleware/catchAsycnError"
 import ErrorHandler from "../utils/ErrorHandle";
 import cloudinary from "cloudinary";
-import { createCourse } from "../services/course.service";
+import { createCourse, getAllCoursesService } from "../services/course.service";
 import CourseModel from "../models/course.model";
 import axios from "axios";
 import connectRedis from "../utils/redis";
@@ -10,7 +10,6 @@ import mongoose from "mongoose";
 import ejs from 'ejs';
 import path from "path";
 import sendMail from "../utils/sendMail";
-import { title } from "process";
 import NotificationModel from "../models/notification.model";
 
 
@@ -45,22 +44,29 @@ export const uploadCourse = CatchAsyncError(async (req: Request, res: Response, 
 export const editCourse = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     try {
         const data = req.body;
+        const thumbnail = data.thumbnail;
         const courseId = req.params.id;
+        const courseData = await CourseModel.findById(courseId) as any;
 
-        //kiểm tra xem thumbnail có public_id không
-        if (data.thumbnail && data.thumbnail.public_id) {
-            await cloudinary.v2.uploader.destroy(data.thumbnail.public_id);
-        }
+        if (thumbnail && !thumbnail.startsWith("https")) {
+            await cloudinary.v2.uploader.destroy(courseData.thumbnail.public_id);
 
-        if (typeof data.thumbnail === 'string') {
-            const myCloud = await cloudinary.v2.uploader.upload(data.thumbnail, {
+            const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
                 folder: "courses"
             });
 
             data.thumbnail = {
                 public_id: myCloud.public_id,
-                url: myCloud.secure_url,
+                url: myCloud.secure_url
             };
+        }
+
+        // Ensure thumbnail is defined before checking startsWith
+        if (thumbnail && thumbnail.startsWith("https")) {
+            data.thumbnail = {
+                public_id: courseData?.thumbnail.public_id,
+                url: courseData?.thumbnail.url
+            }
         }
 
         const course = await CourseModel.findByIdAndUpdate(
@@ -166,6 +172,15 @@ export const getCourseByUser = CatchAsyncError(async (req: Request, res: Respons
         })
     } catch (error: any) {
         return next(new ErrorHandler(error.message, 500));
+    }
+})
+
+// get all courses --- admin
+export const getAdminAllCourses = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        getAllCoursesService(res);
+    } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400));
     }
 })
 
