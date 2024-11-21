@@ -11,7 +11,6 @@ import userRouter from './routes/user.route';
 import courseRouter from './routes/course.route';
 import orderRouter from './routes/order.route';
 import layoutRouter from './routes/layout.route';
-import { initSocketSever } from './socketSever';
 
 const app = express();
 
@@ -52,7 +51,7 @@ app.use(express.json({ limit: "50mb" }));
 // Middleware xử lý cookie
 app.use(cookieParser());
 
-// Định nghĩa các route
+//routes
 app.use("/api/v1/", userRouter, courseRouter, orderRouter, layoutRouter);
 
 // Test API
