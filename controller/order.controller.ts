@@ -8,7 +8,7 @@ import path from "path";
 import ejs from "ejs";
 import sendMail from "../utils/sendMail";
 import NotificationModel from "../models/notification.model";
-import { newOrder } from "../services/order.service";
+import { getAllOrdersService, newOrder } from "../services/order.service";
 import connectRedis from "../utils/redis";
 require('dotenv').config({ path: '.env.development' });
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -164,3 +164,14 @@ export const newPayment = CatchAsyncError(async (req: Request, res: Response, ne
         return next(new ErrorHandler(error.message, 500));
     }
 })
+
+// get all orders --- chi cho admin
+export const getAllOrder = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await getAllOrdersService(res);
+        } catch (error: any) {
+            return next(new ErrorHandler(error.message, 400));
+        }
+    }
+)
