@@ -11,6 +11,7 @@ import userRouter from './routes/user.route';
 import courseRouter from './routes/course.route';
 import orderRouter from './routes/order.route';
 import layoutRouter from './routes/layout.route';
+import { initSocketSever } from './socketSever';
 
 const app = express();
 
