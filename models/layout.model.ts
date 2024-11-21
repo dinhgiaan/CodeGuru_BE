@@ -29,7 +29,7 @@ const faqSchema = new Schema<FaqItem>({
 });
 
 const categorySchema = new Schema<Category>({
-    title:{type:String},
+    title: {type:String},
 });
 
 const bannerImageSchema = new Schema<BannerImage>({
